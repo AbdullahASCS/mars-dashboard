@@ -6,7 +6,24 @@ body {
   font-family: Arial;
   min-height: 100vh;
 }
+img {
+  width: 150px;
+  height: 150px;
+  margin: 15px;
+  
+}
 
+.info {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 12px;
+  border-top: none;
+  border: 2px solid rgb(217, 208, 208);
+  align-items: center;
+  width: 500 px;
+  padding: 20px;
+  background: powderblue;
+}
 header {
   /* header styles */
 }
@@ -15,7 +32,21 @@ main {
   flex: 1;
   padding: 20px;
 }
-
+.button{
+  background-color: #b6b2b2;
+  border: none;
+  color: white;
+  padding: 14px 28px;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  font-size: 14px; 
+  margin: 4px 2px;
+  transition-duration: 0.3s;
+  cursor: pointer;
+}
 footer {
   /* footer styles */
 }
@@ -23,16 +54,40 @@ footer {
 /* -------------------  TABLET  --------------------- */
 @media (min-width: 768px) {
   /* use mobile */
+  .button{
+    padding: 14px 28px;
+    font-size: 18px;
+  }
+  img {
+    width: 200px;
+    height: 200px;
+  }
 }
 
 /* -------------------  DESKTOP  -------------------- */
 
 @media (min-width: 1224px) {
   /* use mobile */
+  .button{
+    padding: 16px 32px;
+    font-size: 20px;
+  }
+  img {
+    width: 250px;
+    height: 250px;
+  }
 }
 
 /* -------------------  LARGE SCREENS  -------------- */
 
 @media (min-width: 1824px) {
   /* use mobile */
+  .button{
+    padding: 18px 36px;
+    font-size: 22px;
+  }
+  img {
+    width: 300px;
+    height: 300px;
+  }
 }
