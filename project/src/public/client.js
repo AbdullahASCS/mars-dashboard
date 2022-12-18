@@ -1,6 +1,6 @@
 let store = {
     user: { name: "Student" },
-    apod: '',
+    roverPhotos : {},
     rovers: ['Curiosity', 'Opportunity', 'Spirit'],
 }
 
@@ -19,25 +19,14 @@ const render = async (root, state) => {
 
 // create content
 const App = (state) => {
-    let { rovers, apod } = state
-
+    let {rovers} = state
+    const Greetify = Adjectify("Greetings")
     return `
         <header></header>
         <main>
-            ${Greeting(store.user.name)}
-            <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
-                ${ImageOfTheDay(apod)}
-            </section>
+            ${Greetify(store.user.name)}
+            ${roverTabs(rovers)}
+            ${generateContent(store,generateRoverInformation,generateRoverPhotos)}
         </main>
         <footer></footer>
     `
@@ -49,57 +38,61 @@ window.addEventListener('load', () => {
 })
 
 // ------------------------------------------------------  COMPONENTS
-
-// Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
-const Greeting = (name) => {
-    if (name) {
-        return `
-            <h1>Welcome, ${name}!</h1>
+ const generateRoverInformation = (roverPhotos) =>{
+    return `<p style="width: 500 px;padding: 20px;background: powderblue;"> you picked the ${roverPhotos.photos[0].rover.name} rover, it launched on ${roverPhotos.photos[0].rover.launch_date} and it landed on ${roverPhotos.photos[0].rover.landing_date} ,
+                the rover's status is currently ${roverPhotos.photos[0].rover.status}
+                </p>`
+ }
+ const generateRoverPhotos = (roverPhotos) =>{
+        return  `
+        <div class = "photos">
+        ${roverPhotos.photos.map((rover) => (
+             `<img src = ${rover.img_src} , width="200" height="200" >`
+        )).join(' ')}
+        
+        </div>
         `
-    }
 
+ }
+ // 1st Higher Order Function
+ const generateContent =  (state, infoGen,photoGen) => {
+        let {roverPhotos} = state;
+        if(Object.keys(roverPhotos).length === 0){
+            return `
+            <p> Please choose a rover </p>
+            `
+        }
+        else{
+
+        return `
+            ${infoGen(roverPhotos)}        
+            ${photoGen(roverPhotos)}    
+        `}
+ }
+ const roverTabs = (rovers) =>{
     return `
-        <h1>Hello!</h1>
+    <div>
+    ${rovers.map((rover) => (
+         `<button class="button" id =${rover} onclick="roverClick(id)">${rover}  </button>`
+    )).join(' ')}
+    </div>
     `
-}
-
-// Example of a pure function that renders infomation requested from the backend
-const ImageOfTheDay = (apod) => {
-
-    // If image does not already exist, or it is not from today -- request it again
-    const today = new Date()
-    const photodate = new Date(apod.date)
-    console.log(photodate.getDate(), today.getDate());
-
-    console.log(photodate.getDate() === today.getDate());
-    if (!apod || apod.date === today.getDate() ) {
-        getImageOfTheDay(store)
-    }
-
-    // check if the photo of the day is actually type video!
-    if (apod.media_type === "video") {
-        return (`
-            <p>See today's featured video <a href="${apod.url}">here</a></p>
-            <p>${apod.title}</p>
-            <p>${apod.explanation}</p>
-        `)
-    } else {
-        return (`
-            <img src="${apod.image.url}" height="350px" width="100%" />
-            <p>${apod.image.explanation}</p>
-        `)
+ }
+// 2nd High Order Function
+const Adjectify = (adj) =>{
+    return function (str){
+        return `<h1> ${adj} ${str} </h1>`
     }
 }
 
 // ------------------------------------------------------  API CALLS
-
-// Example API call
-const getImageOfTheDay = (state) => {
-    let { apod } = state
-
-    fetch(`http://localhost:3000/apod`)
+function roverClick(selectedRover){
+    let roverPhotos;
+    fetch(`http://localhost:3000/rovers/${selectedRover}`)
         .then(res => res.json())
-        .then(apod => updateStore(store, { apod }))
-
-    return data
-}
+        .then((response) => {
+            roverPhotos = response
+            updateStore(store,{roverPhotos})
+        }
+        )
+    }
