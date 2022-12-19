@@ -1,6 +1,6 @@
 let store = {
     user: { name: "Student" },
-    roverPhotos : {},
+    roverPhotos :Immutable.List([]),
     rovers: ['Curiosity', 'Opportunity', 'Spirit'],
 }
 
@@ -19,7 +19,7 @@ const render = async (root, state) => {
 
 // create content
 const App = (state) => {
-    let {rovers} = state
+    const {rovers} = state
     const Greetify = Adjectify("Greetings")
     return `
         <header></header>
@@ -39,15 +39,15 @@ window.addEventListener('load', () => {
 
 // ------------------------------------------------------  COMPONENTS
  const generateRoverInformation = (roverPhotos) =>{
-    return `<p style="width: 500 px;padding: 20px;background: powderblue;"> you picked the ${roverPhotos.photos[0].rover.name} rover, it launched on ${roverPhotos.photos[0].rover.launch_date} and it landed on ${roverPhotos.photos[0].rover.landing_date} ,
-                the rover's status is currently ${roverPhotos.photos[0].rover.status}
+    return `<p class="info"> you picked the ${roverPhotos.first().photos[0].rover.name} rover, it launched on ${roverPhotos.first().photos[0].rover.launch_date} and it landed on ${roverPhotos.first().photos[0].rover.landing_date} ,
+                the rover's status is currently ${roverPhotos.first().photos[0].rover.status}
                 </p>`
  }
  const generateRoverPhotos = (roverPhotos) =>{
         return  `
         <div class = "photos">
-        ${roverPhotos.photos.map((rover) => (
-             `<img src = ${rover.img_src} , width="200" height="200" >`
+        ${roverPhotos.first().photos.map((rover) => (
+             `<img src = ${rover.img_src} >`
         )).join(' ')}
         
         </div>
@@ -56,14 +56,14 @@ window.addEventListener('load', () => {
  }
  // 1st Higher Order Function
  const generateContent =  (state, infoGen,photoGen) => {
-        let {roverPhotos} = state;
-        if(Object.keys(roverPhotos).length === 0){
+        const {roverPhotos} = state;
+        if(roverPhotos.isEmpty()){
             return `
             <p> Please choose a rover </p>
             `
         }
         else{
-
+            
         return `
             ${infoGen(roverPhotos)}        
             ${photoGen(roverPhotos)}    
@@ -91,7 +91,7 @@ function roverClick(selectedRover){
     fetch(`http://localhost:3000/rovers/${selectedRover}`)
         .then(res => res.json())
         .then((response) => {
-            roverPhotos = response
+            roverPhotos = Immutable.List([response]),
             updateStore(store,{roverPhotos})
         }
         )
